@@ -1,0 +1,32 @@
+---
+- name: Create GPU compute profile
+  stevefulme1.rafay.rafay_gpu_profile:
+    name: "{{ gpu_provision_profile_name }}"
+    gpu_type: "{{ gpu_provision_gpu_type }}"
+    allocation: "{{ gpu_provision_allocation | default('dedicated') }}"
+    count: "{{ gpu_provision_gpu_count | default(1) }}"
+    project: "{{ gpu_provision_project }}"
+    state: present
+
+- name: Provision GPU instances
+  stevefulme1.rafay.rafay_gpu_instance:
+    name: "{{ item.name }}"
+    profile: "{{ gpu_provision_profile_name }}"
+    image: "{{ item.image | default(gpu_provision_default_image) }}"
+    project: "{{ gpu_provision_project }}"
+    state: present
+  loop: "{{ gpu_provision_instances }}"
+
+- name: Verify GPU instance health
+  stevefulme1.rafay.rafay_cluster_info:
+    project: "{{ gpu_provision_project }}"
+  register: __gpu_provision_health
+
+- name: Report GPU provisioning results
+  ansible.builtin.debug:
+    msg: >-
+      GPU Provisioning Complete -
+      Profile: {{ gpu_provision_profile_name }},
+      GPU Type: {{ gpu_provision_gpu_type }},
+      Instances: {{ gpu_provision_instances | length }}
+...

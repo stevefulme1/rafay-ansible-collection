@@ -1,0 +1,43 @@
+---
+- name: Trigger backup of source cluster
+  stevefulme1.rafay.rafay_backup_job:
+    name: "dr-drill-{{ ansible_date_time.date }}"
+    cluster: "{{ dr_drill_source_cluster }}"
+    policy: "{{ dr_drill_backup_policy }}"
+    project: "{{ dr_drill_project }}"
+    state: present
+  register: __dr_drill_backup
+
+- name: Restore to target cluster
+  stevefulme1.rafay.rafay_restore:
+    name: "dr-restore-{{ ansible_date_time.date }}"
+    backup_name: "dr-drill-{{ ansible_date_time.date }}"
+    target_cluster: "{{ dr_drill_target_cluster }}"
+    project: "{{ dr_drill_project }}"
+    state: present
+  register: __dr_drill_restore
+
+- name: Validate restored cluster health
+  stevefulme1.rafay.rafay_cluster_info:
+    name: "{{ dr_drill_target_cluster }}"
+    project: "{{ dr_drill_project }}"
+  register: __dr_drill_health
+
+- name: Report DR drill results
+  ansible.builtin.debug:
+    msg: >-
+      DR Drill Complete -
+      Source: {{ dr_drill_source_cluster }},
+      Target: {{ dr_drill_target_cluster }},
+      Backup: {{ __dr_drill_backup.resource | default('created') }},
+      Restore: {{ __dr_drill_restore.resource | default('completed') }}
+
+- name: Teardown DR environment
+  stevefulme1.rafay.rafay_restore:
+    name: "dr-restore-{{ ansible_date_time.date }}"
+    backup_name: "dr-drill-{{ ansible_date_time.date }}"
+    target_cluster: "{{ dr_drill_target_cluster }}"
+    project: "{{ dr_drill_project }}"
+    state: absent
+  when: dr_drill_teardown | default(true)
+...

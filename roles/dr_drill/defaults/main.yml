@@ -1,0 +1,4 @@
+---
+# Run disaster recovery drill with backup, restore, validation, and teardown
+dr_drill_project: default
+dr_drill_api_url: "{{ rafay_api_url | default('https://console.rafay.dev/v3') }}"

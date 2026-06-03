@@ -1,0 +1,22 @@
+---
+galaxy_info:
+  role_name: cluster_deploy
+  author: Steve Fulmer
+  description: Deploy a production-ready Rafay Kubernetes cluster with blueprint, monitoring, and backup
+  company: Red Hat
+  license: GPL-3.0-or-later
+  min_ansible_version: "2.16"
+  platforms:
+    - name: EL
+      versions:
+        - "9"
+    - name: Ubuntu
+      versions:
+        - jammy
+  galaxy_tags:
+    - kubernetes
+    - rafay
+    - cloud
+    - infrastructure
+dependencies:
+  - role: stevefulme1.rafay

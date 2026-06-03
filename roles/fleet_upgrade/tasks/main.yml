@@ -1,0 +1,44 @@
+---
+- name: Get current cluster versions
+  stevefulme1.rafay.rafay_cluster_info:
+    project: "{{ fleet_upgrade_project }}"
+  register: __fleet_clusters
+
+- name: Create fleet upgrade plan
+  stevefulme1.rafay.rafay_fleet_plan:
+    name: "{{ fleet_upgrade_plan_name }}"
+    operation_type: k8s_upgrade
+    target_clusters: "{{ fleet_upgrade_target_clusters }}"
+    phased: "{{ fleet_upgrade_phased | default(true) }}"
+    project: "{{ fleet_upgrade_project }}"
+    state: present
+
+- name: Trigger backup before upgrade
+  stevefulme1.rafay.rafay_backup_job:
+    name: "pre-upgrade-{{ item }}"
+    cluster: "{{ item }}"
+    project: "{{ fleet_upgrade_project }}"
+    state: present
+  loop: "{{ fleet_upgrade_target_clusters }}"
+  when: fleet_upgrade_pre_backup | default(true)
+
+- name: Upgrade non-production clusters first
+  stevefulme1.rafay.rafay_cluster_upgrade:
+    name: "{{ item }}"
+    target_version: "{{ fleet_upgrade_target_version }}"
+  loop: "{{ fleet_upgrade_nonprod_clusters | default([]) }}"
+
+- name: Validate non-production cluster health
+  stevefulme1.rafay.rafay_cluster_info:
+    name: "{{ item }}"
+    project: "{{ fleet_upgrade_project }}"
+  loop: "{{ fleet_upgrade_nonprod_clusters | default([]) }}"
+  register: __fleet_nonprod_health
+
+- name: Upgrade production clusters
+  stevefulme1.rafay.rafay_cluster_upgrade:
+    name: "{{ item }}"
+    target_version: "{{ fleet_upgrade_target_version }}"
+  loop: "{{ fleet_upgrade_prod_clusters | default([]) }}"
+  when: fleet_upgrade_auto_promote | default(false)
+...

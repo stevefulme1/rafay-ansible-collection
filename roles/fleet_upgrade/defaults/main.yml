@@ -1,0 +1,4 @@
+---
+# Execute phased fleet-wide Kubernetes upgrade with validation gates
+fleet_upgrade_project: default
+fleet_upgrade_api_url: "{{ rafay_api_url | default('https://console.rafay.dev/v3') }}"

@@ -1,0 +1,52 @@
+---
+- name: Ensure cloud credentials exist
+  stevefulme1.rafay.rafay_cloud_credential:
+    name: "{{ cluster_deploy_cloud_credential }}"
+    provider: "{{ cluster_deploy_provider }}"
+    credentials: "{{ cluster_deploy_cloud_credentials }}"
+    project: "{{ cluster_deploy_project }}"
+    state: present
+
+- name: Create Kubernetes cluster
+  stevefulme1.rafay.rafay_cluster:
+    name: "{{ cluster_deploy_cluster_name }}"
+    cluster_type: "{{ cluster_deploy_cluster_type }}"
+    blueprint: "{{ cluster_deploy_blueprint | default(omit) }}"
+    cloud_credential: "{{ cluster_deploy_cloud_credential }}"
+    region: "{{ cluster_deploy_region }}"
+    project: "{{ cluster_deploy_project }}"
+    state: present
+  register: __cluster_deploy_cluster
+
+- name: Configure node groups
+  stevefulme1.rafay.rafay_node_group:
+    name: "{{ item.name }}"
+    cluster: "{{ cluster_deploy_cluster_name }}"
+    instance_type: "{{ item.instance_type }}"
+    min_count: "{{ item.min_count | default(1) }}"
+    max_count: "{{ item.max_count | default(3) }}"
+    disk_size: "{{ item.disk_size | default(100) }}"
+    project: "{{ cluster_deploy_project }}"
+    state: present
+  loop: "{{ cluster_deploy_node_groups }}"
+
+- name: Configure backup policy
+  stevefulme1.rafay.rafay_backup_policy:
+    name: "{{ cluster_deploy_cluster_name }}-backup"
+    schedule: "{{ cluster_deploy_backup_schedule | default('0 2 * * *') }}"
+    retention_days: "{{ cluster_deploy_backup_retention | default(30) }}"
+    include_pvs: true
+    storage_location: "{{ cluster_deploy_backup_location }}"
+    project: "{{ cluster_deploy_project }}"
+    state: present
+  when: cluster_deploy_enable_backup | default(true)
+
+- name: Verify cluster health
+  stevefulme1.rafay.rafay_cluster_info:
+    name: "{{ cluster_deploy_cluster_name }}"
+    project: "{{ cluster_deploy_project }}"
+  register: __cluster_deploy_health
+  until: __cluster_deploy_health.resources | length > 0
+  retries: 30
+  delay: 30
+...

@@ -1,0 +1,4 @@
+---
+# Onboard a new team with project, namespaces, RBAC, and cost allocation
+onboard_team_project: default
+onboard_team_api_url: "{{ rafay_api_url | default('https://console.rafay.dev/v3') }}"

@@ -1,0 +1,4 @@
+---
+# Deploy a production-ready Rafay Kubernetes cluster with blueprint, monitoring, and backup
+cluster_deploy_project: default
+cluster_deploy_api_url: "{{ rafay_api_url | default('https://console.rafay.dev/v3') }}"

@@ -1,0 +1,4 @@
+---
+# Provision GPU infrastructure for AI workloads with compute profiles and inference endpoints
+gpu_provision_project: default
+gpu_provision_api_url: "{{ rafay_api_url | default('https://console.rafay.dev/v3') }}"
