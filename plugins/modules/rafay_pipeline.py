@@ -23,9 +23,11 @@ options:
   stages:
     description: The stages of the resource.
     type: list
+    elements: dict
   triggers:
     description: The triggers of the resource.
     type: list
+    elements: dict
   approval_required:
     description: The approval required of the resource.
     type: bool
@@ -64,8 +66,8 @@ def main():
     argument_spec = rafay_argument_spec.copy()
     argument_spec.update(
         name=dict(type='str', required=True),
-        stages=dict(type='list'),
-        triggers=dict(type='list'),
+        stages=dict(type='list', elements='dict'),
+        triggers=dict(type='list', elements='dict'),
         approval_required=dict(type='bool', default=False),
         state=dict(type='str', choices=['present', 'absent'], default='present'),
     )

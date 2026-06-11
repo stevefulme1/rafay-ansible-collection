@@ -36,6 +36,7 @@ options:
   group_mappings:
     description: The group mappings of the resource.
     type: list
+    elements: dict
   state:
     description: The state of the resource.
     type: str
@@ -74,7 +75,7 @@ def main():
         metadata_url=dict(type='str'),
         client_id=dict(type='str'),
         client_secret=dict(type='str', no_log=True),
-        group_mappings=dict(type='list'),
+        group_mappings=dict(type='list', elements='dict'),
         state=dict(type='str', choices=['present', 'absent'], default='present'),
     )
 

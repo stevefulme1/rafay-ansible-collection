@@ -26,6 +26,7 @@ options:
   addons:
     description: The addons of the resource.
     type: list
+    elements: dict
   drift_detection:
     description: The drift detection of the resource.
     type: bool
@@ -65,7 +66,7 @@ def main():
     argument_spec.update(
         name=dict(type='str', required=True),
         version=dict(type='str'),
-        addons=dict(type='list'),
+        addons=dict(type='list', elements='dict'),
         drift_detection=dict(type='bool', default=True),
         state=dict(type='str', choices=['present', 'absent'], default='present'),
     )

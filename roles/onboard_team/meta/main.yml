@@ -18,5 +18,4 @@ galaxy_info:
     - rafay
     - cloud
     - infrastructure
-dependencies:
-  - role: stevefulme1.rafay
+dependencies: []

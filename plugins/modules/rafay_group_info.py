@@ -7,40 +7,34 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: rafay_audit_info
-short_description: Get Rafay audit log entries
+module: rafay_group_info
+short_description: Get Rafay group information
 description:
-  - Retrieve information about Rafay audit info resources.
+  - Retrieve information about Rafay group resources.
   - Supports OIDC workload identity via bearer token authentication for zero-trust environments.
 version_added: "1.0.0"
 author:
   - Steve Fulmer (@stevefulme1)
 options:
-  start_time:
-    description: The start time of the resource.
-    type: str
-  end_time:
-    description: The end time of the resource.
-    type: str
-  user:
-    description: The user of the resource.
-    type: str
-  action:
-    description: The action of the resource.
+  name:
+    description: The name of the resource.
     type: str
 extends_documentation_fragment:
   - stevefulme1.rafay.rafay
 """
 
 EXAMPLES = r"""
-- name: Get audit info
-  stevefulme1.rafay.rafay_audit_info:
-    name: my-audit_info
+- name: Get all groups
+  stevefulme1.rafay.rafay_group_info:
+
+- name: Get specific group
+  stevefulme1.rafay.rafay_group_info:
+    name: my-group
 """
 
 RETURN = r"""
 resources:
-  description: List of audit_info resources.
+  description: List of group resources.
   type: list
   returned: always
 """
@@ -55,10 +49,7 @@ from ansible_collections.stevefulme1.rafay.plugins.module_utils.rafay import (
 def main():
     argument_spec = rafay_argument_spec.copy()
     argument_spec.update(
-        start_time=dict(type='str'),
-        end_time=dict(type='str'),
-        user=dict(type='str'),
-        action=dict(type='str'),
+        name=dict(type='str'),
     )
 
     module = AnsibleModule(
@@ -67,8 +58,7 @@ def main():
     )
 
     rafay = RafayModule(module)
-    project = module.params.get('project', 'default')
-    path = '/auth/v3/audit/'
+    path = '/auth/v3/group/'
     status, result = rafay.get(path)
     if status != 200:
         module.fail_json(msg='Failed to get resources', status=status)

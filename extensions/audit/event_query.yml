@@ -1,0 +1,101 @@
+---
+stevefulme1.rafay.*:
+  query: >-
+    (
+      {
+        "cluster": "Kubernetes Cluster",
+        "project": "Project",
+        "namespace": "Namespace",
+        "workload": "Workload",
+        "node_group": "Node Group",
+        "blueprint": "Blueprint",
+        "addon": "Addon",
+        "environment": "Environment",
+        "environment_template": "Environment Template",
+        "pipeline": "Pipeline",
+        "repository": "Repository",
+        "backup_policy": "Backup Policy",
+        "backup_job": "Backup Job",
+        "backup_location": "Backup Location",
+        "restore": "Restore",
+        "gpu_instance": "GPU Instance",
+        "gpu_profile": "GPU Profile",
+        "fleet_plan": "Fleet Plan",
+        "network_policy": "Network Policy",
+        "opa_policy": "OPA Policy",
+        "cost_profile": "Cost Profile",
+        "cloud_credential": "Cloud Credential",
+        "secret_store": "Secret Store",
+        "catalog": "Catalog",
+        "resource_template": "Resource Template",
+        "config_context": "Config Context",
+        "sso": "SSO",
+        "user": "User",
+        "group": "Group",
+        "role": "Role"
+      } as $mapping |
+      (.resource // .) |
+      (if type=="array" then .[] else if type=="object" then . else empty end end) as $data |
+      select($data.metadata != null or $data.name != null or $data.id != null) |
+      (
+        if $data | has("cluster_type") then "cluster"
+        elif $data | has("spec") and ($data.spec | has("workload")) then "workload"
+        elif $data | has("spec") and ($data.spec | has("nodes")) then "node_group"
+        elif $data | has("spec") and ($data.spec | has("blueprint")) then "blueprint"
+        elif $data | has("spec") and ($data.spec | has("addon")) then "addon"
+        elif $data | has("spec") and ($data.spec | has("environment")) then "environment"
+        elif $data | has("spec") and ($data.spec | has("pipeline")) then "pipeline"
+        elif $data | has("spec") and ($data.spec | has("repository")) then "repository"
+        elif $data | has("spec") and ($data.spec | has("backup")) then "backup_policy"
+        elif $data | has("spec") and ($data.spec | has("restore")) then "restore"
+        elif $data | has("spec") and ($data.spec | has("gpu")) then "gpu_instance"
+        elif $data | has("spec") and ($data.spec | has("fleet")) then "fleet_plan"
+        elif $data | has("spec") and ($data.spec | has("network")) then "network_policy"
+        elif $data | has("spec") and ($data.spec | has("opa")) then "opa_policy"
+        elif $data.metadata.name then ($data.metadata.name | split("-") | .[0])
+        else "unknown"
+        end
+      ) as $node_type |
+      (
+        if $node_type == "cluster" then ($data.cluster_type // "k8s")
+        elif $node_type == "workload" then "deployment"
+        elif $node_type == "node_group" then "nodes"
+        elif $node_type == "gpu_instance" then "gpu"
+        elif $node_type == "backup_policy" or $node_type == "backup_job" then "backup"
+        else ($node_type | split("_") | .[0])
+        end
+      ) as $sub_node_type |
+      {
+        name: (
+          if $data.metadata then ($data.metadata.name // $data.metadata.id)
+          else ($data.name // $data.id)
+          end
+        ),
+        canonical_facts: {
+          name: (
+            if $data.metadata then ($data.metadata.name // "UNKNOWN")
+            else ($data.name // "UNKNOWN")
+            end
+          ),
+          id: (
+            if $data.metadata then ($data.metadata.id // $data.metadata.name)
+            else ($data.id // $data.name)
+            end
+          ),
+          node_type: $node_type
+        },
+        facts: {
+          infra_type: "rafay_kubernetes",
+          infra_bucket: ($mapping[$node_type] // "UNKNOWN"),
+          device_type: $sub_node_type,
+          project: (
+            if $data.metadata then ($data.metadata.project // "default")
+            else "default"
+            end
+          ),
+          region: ($data.region // ""),
+          cluster_type: ($data.cluster_type // ""),
+          state: ($data.state // "unknown")
+        }
+      }
+    )

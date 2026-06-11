@@ -23,6 +23,7 @@ options:
   permissions:
     description: The permissions of the resource.
     type: list
+    elements: str
   scope:
     description: The scope of the resource.
     type: str
@@ -60,7 +61,7 @@ def main():
     argument_spec = rafay_argument_spec.copy()
     argument_spec.update(
         name=dict(type='str', required=True),
-        permissions=dict(type='list'),
+        permissions=dict(type='list', elements='str'),
         scope=dict(type='str'),
         state=dict(type='str', choices=['present', 'absent'], default='present'),
     )

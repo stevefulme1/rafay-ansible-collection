@@ -23,6 +23,7 @@ options:
   roles:
     description: The roles of the resource.
     type: list
+    elements: str
   state:
     description: The state of the resource.
     type: str
@@ -57,7 +58,7 @@ def main():
     argument_spec = rafay_argument_spec.copy()
     argument_spec.update(
         name=dict(type='str', required=True),
-        roles=dict(type='list'),
+        roles=dict(type='list', elements='str'),
         state=dict(type='str', choices=['present', 'absent'], default='present'),
     )
 

@@ -32,6 +32,7 @@ options:
   groups:
     description: The groups of the resource.
     type: list
+    elements: str
   state:
     description: The state of the resource.
     type: str
@@ -69,7 +70,7 @@ def main():
         first_name=dict(type='str'),
         last_name=dict(type='str'),
         email=dict(type='str'),
-        groups=dict(type='list'),
+        groups=dict(type='list', elements='str'),
         state=dict(type='str', choices=['present', 'absent'], default='present'),
     )
 

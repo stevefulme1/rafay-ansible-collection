@@ -26,6 +26,7 @@ options:
   items:
     description: The items of the resource.
     type: list
+    elements: dict
   state:
     description: The state of the resource.
     type: str
@@ -61,7 +62,7 @@ def main():
     argument_spec.update(
         name=dict(type='str', required=True),
         description=dict(type='str'),
-        items=dict(type='list'),
+        items=dict(type='list', elements='dict'),
         state=dict(type='str', choices=['present', 'absent'], default='present'),
     )
 

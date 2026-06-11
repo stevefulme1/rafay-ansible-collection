@@ -27,6 +27,7 @@ options:
   target_clusters:
     description: The target clusters of the resource.
     type: list
+    elements: str
   phased:
     description: The phased of the resource.
     type: bool
@@ -66,7 +67,7 @@ def main():
     argument_spec.update(
         name=dict(type='str', required=True),
         operation_type=dict(type='str', choices=['blueprint_upgrade', 'k8s_upgrade', 'addon_update']),
-        target_clusters=dict(type='list'),
+        target_clusters=dict(type='list', elements='str'),
         phased=dict(type='bool', default=True),
         state=dict(type='str', choices=['present', 'absent'], default='present'),
     )

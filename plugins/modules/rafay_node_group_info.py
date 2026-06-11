@@ -7,40 +7,40 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: rafay_audit_info
-short_description: Get Rafay audit log entries
+module: rafay_node_group_info
+short_description: Get Rafay node group information
 description:
-  - Retrieve information about Rafay audit info resources.
+  - Retrieve information about Rafay node group resources.
   - Supports OIDC workload identity via bearer token authentication for zero-trust environments.
 version_added: "1.0.0"
 author:
   - Steve Fulmer (@stevefulme1)
 options:
-  start_time:
-    description: The start time of the resource.
+  cluster:
+    description: The cluster name.
     type: str
-  end_time:
-    description: The end time of the resource.
-    type: str
-  user:
-    description: The user of the resource.
-    type: str
-  action:
-    description: The action of the resource.
+    required: true
+  name:
+    description: The name of the resource.
     type: str
 extends_documentation_fragment:
   - stevefulme1.rafay.rafay
 """
 
 EXAMPLES = r"""
-- name: Get audit info
-  stevefulme1.rafay.rafay_audit_info:
-    name: my-audit_info
+- name: Get all node groups in a cluster
+  stevefulme1.rafay.rafay_node_group_info:
+    cluster: my-cluster
+
+- name: Get specific node group
+  stevefulme1.rafay.rafay_node_group_info:
+    cluster: my-cluster
+    name: my-node-group
 """
 
 RETURN = r"""
 resources:
-  description: List of audit_info resources.
+  description: List of node group resources.
   type: list
   returned: always
 """
@@ -55,10 +55,8 @@ from ansible_collections.stevefulme1.rafay.plugins.module_utils.rafay import (
 def main():
     argument_spec = rafay_argument_spec.copy()
     argument_spec.update(
-        start_time=dict(type='str'),
-        end_time=dict(type='str'),
-        user=dict(type='str'),
-        action=dict(type='str'),
+        cluster=dict(type='str', required=True),
+        name=dict(type='str'),
     )
 
     module = AnsibleModule(
@@ -68,7 +66,8 @@ def main():
 
     rafay = RafayModule(module)
     project = module.params.get('project', 'default')
-    path = '/auth/v3/audit/'
+    cluster = module.params['cluster']
+    path = '/infra/v3/project/{project}/cluster/{cluster}/nodegroup/'.format(project=project, cluster=cluster)
     status, result = rafay.get(path)
     if status != 200:
         module.fail_json(msg='Failed to get resources', status=status)

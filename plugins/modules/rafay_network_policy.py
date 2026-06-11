@@ -27,6 +27,7 @@ options:
   rules:
     description: The rules of the resource.
     type: list
+    elements: dict
   default_action:
     description: The default action of the resource.
     type: str
@@ -66,7 +67,7 @@ def main():
     argument_spec.update(
         name=dict(type='str', required=True),
         cluster=dict(type='str', required=True),
-        rules=dict(type='list'),
+        rules=dict(type='list', elements='dict'),
         default_action=dict(type='str', choices=['allow', 'deny']),
         state=dict(type='str', choices=['present', 'absent'], default='present'),
     )

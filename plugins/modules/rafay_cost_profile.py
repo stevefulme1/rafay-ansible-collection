@@ -23,6 +23,7 @@ options:
   clusters:
     description: The clusters of the resource.
     type: list
+    elements: str
   chargeback_group:
     description: The chargeback group of the resource.
     type: str
@@ -60,7 +61,7 @@ def main():
     argument_spec = rafay_argument_spec.copy()
     argument_spec.update(
         name=dict(type='str', required=True),
-        clusters=dict(type='list'),
+        clusters=dict(type='list', elements='str'),
         chargeback_group=dict(type='str'),
         state=dict(type='str', choices=['present', 'absent'], default='present'),
     )

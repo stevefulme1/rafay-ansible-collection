@@ -34,6 +34,7 @@ options:
   namespaces:
     description: The namespaces of the resource.
     type: list
+    elements: str
   storage_location:
     description: The storage location of the resource.
     type: str
@@ -74,7 +75,7 @@ def main():
         schedule=dict(type='str'),
         retention_days=dict(type='int', default=30),
         include_pvs=dict(type='bool', default=True),
-        namespaces=dict(type='list'),
+        namespaces=dict(type='list', elements='str'),
         storage_location=dict(type='str'),
         state=dict(type='str', choices=['present', 'absent'], default='present'),
     )
