@@ -2,7 +2,7 @@
 - name: Get current cluster versions
   stevefulme1.rafay.rafay_cluster_info:
     project: "{{ fleet_upgrade_project }}"
-  register: __fleet_clusters
+  register: fleet_upgrade__fleet_clusters
 
 - name: Create fleet upgrade plan
   stevefulme1.rafay.rafay_fleet_plan:
@@ -33,7 +33,7 @@
     name: "{{ item }}"
     project: "{{ fleet_upgrade_project }}"
   loop: "{{ fleet_upgrade_nonprod_clusters | default([]) }}"
-  register: __fleet_nonprod_health
+  register: fleet_upgrade__fleet_nonprod_health
 
 - name: Upgrade production clusters
   stevefulme1.rafay.rafay_cluster_upgrade:
