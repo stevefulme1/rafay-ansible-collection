@@ -1,4 +1,4 @@
 # TO-DO: add python packages that are required for testing this collection
 pytest-ansible>=24.1.0,<25.0.0
-pytest-xdist>=3.5.0,<4.0.0
+pytest-xdist>=3.8.0,<4.0.0
 molecule>=24.2.0,<25.0.0
