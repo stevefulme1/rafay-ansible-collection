@@ -5,7 +5,7 @@
 
 namespace: "stevefulme1"
 name: "rafay"
-version: 1.0.0
+version: 1.1.0
 readme: README.md
 authors:
   - Steve Fulmer <sfulmer@redhat.com>
